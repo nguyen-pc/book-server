@@ -41,33 +41,30 @@ async function create(req, res) {
 }
 
 async function returnBook(req, res) {
-  const { borrowId, actualReturnDate } = req.body;
-  if (!borrowId || !actualReturnDate) {
-    return res.status(422).json({ message: "Invalid field" });
-  }
-
+  const borrowId = req.params.borrowId;
+  const { returnDate } = req.body;
   try {
-    // Tìm bản ghi mượn sách
-    const borrow = await Borrow.findById(borrowId);
+    const borrow = await Borrow.findById(borrowId).populate("book");
     if (!borrow) {
       return res.status(404).json({ message: "Borrow record not found" });
     }
-
-    // Cập nhật ngày trả sách thực tế
-    borrow.actualReturnDate = actualReturnDate;
+    if (borrow.actualReturnDate) {
+      return res.status(400).json({ message: "Book already returned" });
+    }
+    borrow.actualReturnDate = returnDate || new Date().toISOString();
     await borrow.save();
 
-    // Tăng số lượng sách
-    const bookToReturn = await Book.findById(borrow.book);
-    if (bookToReturn) {
-      bookToReturn.number += 1;
-      await bookToReturn.save();
+    const book = await Book.findById(borrow.book._id);
+    if (book) {
+      book.number += 1;
+      await book.save();
     }
 
-    return res.sendStatus(200);
+    return res.status(200).json({ actualReturnDate: borrow.actualReturnDate });
   } catch (e) {
+    console.error("Error returning book:", e);
     return res
-      .status(400)
+      .status(500)
       .json({ message: "Could not return book", error: e.message });
   }
 }
@@ -93,7 +90,9 @@ async function getUserBorrow(req, res) {
     return res.status(400).json({ message: "invalid" });
   }
   try {
-    const borrowUser = await Borrow.find({ user: userId }).exec();
+    const borrowUser = await Borrow.find({ user: userId })
+      .populate("book", "name")
+      .exec();
     if (!borrowUser) {
       return res.status(405).json({ message: "borrowUser not found" });
     } else {

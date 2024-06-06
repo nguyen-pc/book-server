@@ -42,12 +42,13 @@ if (!fs.existsSync(uploadsDir)) {
 app.use(errorHandlerMiddleware);
 //route
 app.use("/api/book", require("./routes/api/book"));
-app.use("/uploads", express.static("uploads"));
 app.use("/api/author", require("./routes/api/author"));
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/publisher", require("./routes/api/publisher"));
 app.use("/api/borrow", require("./routes/api/borrow"));
+app.use("/api/comment", require("./routes/api/comment"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static("uploads"));
 
 app.all("*", (req, res) => {
   res.status(404);

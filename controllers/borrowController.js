@@ -1,5 +1,6 @@
 const Borrow = require("../models/Borrow");
 const Book = require("../models/Book");
+const emailService = require("../service/emailService");
 
 async function create(req, res) {
   const { user, book, borrowedDay, estimatedReturnDate, actualReturnDate } =
@@ -18,6 +19,7 @@ async function create(req, res) {
     if (bookToBorrow.number <= 0) {
       return res.status(400).json({ message: "Book is out of stock" });
     }
+    // await emailService.sendSimpleEmail();
 
     // Tạo bản ghi mượn sách
     await Borrow.create({

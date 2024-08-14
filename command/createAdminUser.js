@@ -1,7 +1,7 @@
 const connectDB = require("../config/database");
 const readline = require("readline");
 const User = require("../models/User");
-
+const bcrypt = require("bcrypt");
 connectDB();
 
 const rl = readline.createInterface({
@@ -25,11 +25,11 @@ const createAdminUser = async () => {
           rl.question("Nhập tên: ", async (last_name) => {
             rl.question("Nhập SĐT: ", async (phoneNumber) => {
               // Hash admin password
-
+              hashedPassword = await bcrypt.hash(password, 10)
               // Create admin user
               await User.create({
                 email,
-                password,
+                password: hashedPassword,
                 first_name,
                 last_name,
                 phoneNumber,

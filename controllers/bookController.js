@@ -45,7 +45,7 @@ async function getAllBook(req, res) {
 async function getBookById(req, res) {
   const { id } = req.params;
   try {
-    const book = await Book.findById(id).exec();
+    const book = await Book.findById(id).populate("author").exec();
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     } else {

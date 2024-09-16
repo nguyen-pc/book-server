@@ -18,7 +18,7 @@ async function register(req, res) {
     !first_name ||
     !last_name ||
     !email ||
-    !phoneNumber ||
+    // !phoneNumber ||
     !password ||
     !password_confirm
   ) {

@@ -159,10 +159,44 @@ async function user(req, res) {
   return res.status(200).json(user);
 }
 
+
 async function getAllUser(req, res) {
   try {
-    const users = await User.find().exec();
-    return res.status(200).json(users);
+    const pageNumber = parseInt(req.query.pageNumber) || 0;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const result = {};
+
+    console.log(pageNumber, limit);
+
+    const users = await User.countDocuments().exec();
+    let startIndex = pageNumber * limit;
+    const endIndex = (pageNumber + 1) * limit;
+
+    result.users = users;
+    const totalPage = Math.ceil(users / limit);
+    if (startIndex > 0) {
+      result.previous = {
+        pageNumber: pageNumber - 1,
+        limit: limit,
+      };
+    }
+    if (endIndex < (await User.countDocuments().exec())) {
+      result.next = {
+        pageNumber: pageNumber + 1,
+        limit: limit,
+      };
+    }
+
+    result.data = await User.find()
+      .sort("-_id")
+      .skip(startIndex)
+      .limit(limit)
+      .exec();
+
+    result.rowsPerPage = limit;
+    result.totalPage = totalPage;
+    return res.status(200).json(result);
   } catch (e) {
     console.error("Error retrieving users:", e);
     return res
@@ -170,6 +204,8 @@ async function getAllUser(req, res) {
       .json({ message: "Could not retrieve books", error: e.message });
   }
 }
+
+
 
 async function create(req, res) {
   const {
@@ -194,7 +230,7 @@ async function create(req, res) {
     !phoneNumber ||
     !password ||
     !password_confirm ||
-    !isStaff ||
+    // !isStaff ||
     !address ||
     !gender ||
     !birthday

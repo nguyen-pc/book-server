@@ -36,8 +36,40 @@ async function getAuthorById(req, res) {
 
 async function getAllAuthor(req, res) {
   try {
-    const author = await Author.find().exec();
-    return res.status(200).json(author);
+    const pageNumber = parseInt(req.query.pageNumber) || 0;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const result = {};
+
+    const author = await Author.countDocuments().exec();
+    let startIndex = pageNumber * limit;
+    const endIndex = (pageNumber + 1) * limit;
+    result.author = author;
+    const totalPage = Math.ceil(author / limit);
+
+    if (startIndex > 0) {
+      result.previous = {
+        pageNumber: pageNumber - 1,
+        limit: limit,
+      };
+    }
+    if (endIndex < (await Author.countDocuments().exec())) {
+      result.next = {
+        pageNumber: pageNumber + 1,
+        limit: limit,
+      };
+    }
+
+    result.data = await Author.find()
+      .sort("-_id")
+      .skip(startIndex)
+      .limit(limit)
+      .exec();
+
+    result.rowsPerPage = limit;
+    result.totalPage = totalPage;
+
+    return res.status(200).json(result);
   } catch (e) {
     console.error("Error retrieving author:", e);
     return res

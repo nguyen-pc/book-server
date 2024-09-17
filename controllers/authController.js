@@ -167,8 +167,6 @@ async function getAllUser(req, res) {
 
     const result = {};
 
-    console.log(pageNumber, limit);
-
     const users = await User.countDocuments().exec();
     let startIndex = pageNumber * limit;
     const endIndex = (pageNumber + 1) * limit;

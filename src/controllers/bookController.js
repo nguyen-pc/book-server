@@ -29,11 +29,42 @@ async function create(req, res) {
 
 async function getAllBook(req, res) {
   try {
-    const books = await Book.find()
+    const pageNumber = parseInt(req.query.pageNumber) || 0;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const result = {};
+
+    const book = await Book.countDocuments().exec();
+    let startIndex = pageNumber * limit;
+    const endIndex = (pageNumber + 1) * limit;
+    result.book = book;
+    const totalPage = Math.ceil(book / limit);
+
+    if (startIndex > 0) {
+      result.previous = {
+        pageNumber: pageNumber - 1,
+        limit: limit,
+      };
+    }
+    if (endIndex < (await Book.countDocuments().exec())) {
+      result.next = {
+        pageNumber: pageNumber + 1,
+        limit: limit,
+      };
+    }
+
+    result.data = await Book.find()
       .populate("author", "name")
       .populate("publisher", "name")
+      .sort("-_id")
+      .skip(startIndex)
+      .limit(limit)
       .exec();
-    return res.status(200).json(books);
+
+    result.rowsPerPage = limit;
+    result.totalPage = totalPage;
+
+    return res.status(200).json(result);
   } catch (e) {
     console.error("Error retrieving books:", e);
     return res
@@ -45,7 +76,10 @@ async function getAllBook(req, res) {
 async function getBookById(req, res) {
   const { id } = req.params;
   try {
-    const book = await Book.findById(id).populate("author").exec();
+    const book = await Book.findById(id)
+      .populate("author", "name")
+      .populate("publisher", "name")
+      .exec();
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     } else {

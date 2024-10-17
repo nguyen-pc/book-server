@@ -1,7 +1,7 @@
 const express = require("express");
 const Book = require("../../models/Book");
 const bookController = require("../../controllers/bookController");
-const upload = require("../../photo/upload");
+const upload = require("../../../photo/upload");
 const router = express.Router();
 
 // Tạo sách

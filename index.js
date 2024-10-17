@@ -5,11 +5,11 @@ const path = require("path");
 const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
-const corsOptions = require("./config/cors");
-const connectDB = require("./config/database");
-const credentials = require("./middleware/credentials");
-const errorHandlerMiddleware = require("./middleware/error_handleware");
-const authenticationMiddleware = require("./middleware/authentication");
+const corsOptions = require("./src/config/cors");
+const connectDB = require("./src/config/database");
+const credentials = require("./src/middleware/credentials");
+const errorHandlerMiddleware = require("./src/middleware/error_handleware");
+const authenticationMiddleware = require("./src/middleware/authentication");
 
 const app = express();
 const PORT = 3500;
@@ -41,12 +41,12 @@ if (!fs.existsSync(uploadsDir)) {
 //Default error handle
 app.use(errorHandlerMiddleware);
 //route
-app.use("/api/book", require("./routes/api/book"));
-app.use("/api/author", require("./routes/api/author"));
-app.use("/api/auth", require("./routes/api/auth"));
-app.use("/api/publisher", require("./routes/api/publisher"));
-app.use("/api/borrow", require("./routes/api/borrow"));
-app.use("/api/comment", require("./routes/api/comment"));
+app.use("/api/book", require("./src/routes/api/book"));
+app.use("/api/author", require("./src/routes/api/author"));
+app.use("/api/auth", require("./src/routes/api/auth"));
+app.use("/api/publisher", require("./src/routes/api/publisher"));
+app.use("/api/borrow", require("./src/routes/api/borrow"));
+app.use("/api/comment", require("./src/routes/api/comment"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/uploads", express.static("uploads"));
 

@@ -2,7 +2,8 @@ require("dotenv").config();
 
 const nodemailer = require("nodemailer");
 
-let sendSimpleEmail = async () => {
+let sendSimpleEmail = async (email, bookName, borrowDay) => {
+  console.log("email", email, bookName, borrowDay);
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -17,21 +18,22 @@ let sendSimpleEmail = async () => {
   // send mail with defined transport object
   let info = await transporter.sendMail({
     from: '"Thanh Nguyen 👻" <nguyenthcs430@gmail.com>', // sender address
-    to: "nhaclofichill228@gmail.com", // list of receivers
+    to: email, // list of receivers
     subject: "Thông tin mượn sách", // Subject line
-    html: getBodyHTMLEmail(),
+    html: getBodyHTMLEmail(bookName, borrowDay),
   });
 };
 
-let getBodyHTMLEmail = () => {
+let getBodyHTMLEmail = (bookName, borrowDay) => {
   let result = "";
 
   result = `
     <h3> Xin chào !</h3>
-    <p>Bạn nhận được email này vì đã muon sach thanh cong</p>
-    <p>Thông tin muon sach: </p>
-    <p>Ten sach:</p>
-    <div>Xin chân thành cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</div>
+    <p>Bạn nhận được email này vì đã mượn sách thành công</p>
+    <p>Thông tin mượn sách: </p>
+    <p>Tên sách:${bookName} </p>
+    <p>Thời hạn trả 2 tuần: ${borrowDay}</p>
+    <div>Xin chân thành cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</div>
 `;
   return result;
 };

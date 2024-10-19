@@ -3,8 +3,15 @@ const Book = require("../models/Book");
 const emailService = require("../service/emailService");
 
 async function create(req, res) {
-  const { user, book, borrowedDay, estimatedReturnDate, actualReturnDate } =
-    req.body;
+  const {
+    email,
+    bookName,
+    user,
+    book,
+    borrowedDay,
+    estimatedReturnDate,
+    actualReturnDate,
+  } = req.body;
   if (!user || !book || !borrowedDay) {
     return res.status(422).json({ message: "Invalid field" });
   }
@@ -19,8 +26,9 @@ async function create(req, res) {
     if (bookToBorrow.number <= 0) {
       return res.status(400).json({ message: "Book is out of stock" });
     }
-    // await emailService.sendSimpleEmail();
-
+    // console.log(email, bookName);
+    // await emailService.sendSimpleEmail(email, bookName, estimatedReturnDate);
+    // console.log("<<<<<<<<<<<<<<<<");
     // Tạo bản ghi mượn sách
     await Borrow.create({
       user,

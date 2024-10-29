@@ -15,6 +15,7 @@ router.put("/bookId/:bookId", bookController.updateBook);
 router.post("/uploadCover", upload.single("cover"), (req, res) => {
   try {
     const coverPath = req.file.filename; //path
+    console.log(coverPath);
     res.status(200).json({
       message: "Upload ảnh thành công",
       imageUrl: coverPath, // Đường dẫn ảnh được trả về để lưu trữ trong thông tin sách

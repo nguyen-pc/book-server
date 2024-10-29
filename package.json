@@ -9,7 +9,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node index",
         "dev": "nodemon index",
-        "create-admin-user": "node command/createAdminUser.js"
+        "create-admin-user": "node src/command/createAdminUser.js"
     },
     "author": "",
     "license": "ISC",

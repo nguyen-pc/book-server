@@ -11,5 +11,9 @@ const AuthorSchema = Schema({
     type: String,
     require: true,
   },
+  detail:{
+    type: String,
+    require: false,
+  }
 });
 module.exports = mongoose.model("Author", AuthorSchema);

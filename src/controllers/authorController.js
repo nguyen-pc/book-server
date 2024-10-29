@@ -1,7 +1,7 @@
 const Author = require("../models/Author");
 
 async function create(req, res) {
-  const { name, address } = req.body;
+  const { name, address, detail } = req.body;
 
   if (!name || !address) {
     return res.status(422).json({ message: "Invalid field" });
@@ -11,6 +11,7 @@ async function create(req, res) {
     await Author.create({
       name,
       address,
+      detail,
     });
     return res.sendStatus(201);
   } catch (e) {

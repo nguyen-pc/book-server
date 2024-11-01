@@ -26,9 +26,9 @@ async function create(req, res) {
     if (bookToBorrow.number <= 0) {
       return res.status(400).json({ message: "Book is out of stock" });
     }
-    // console.log(email, bookName);
-    // await emailService.sendSimpleEmail(email, bookName, estimatedReturnDate);
-    // console.log("<<<<<<<<<<<<<<<<");
+    console.log(email, bookName);
+    await emailService.sendSimpleEmail(email, bookName, estimatedReturnDate);
+    console.log("<<<<<<<<<<<<<<<<");
     // Tạo bản ghi mượn sách
     await Borrow.create({
       user,

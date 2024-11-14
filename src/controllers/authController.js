@@ -76,6 +76,60 @@ async function logout(req, res) {
   res.sendStatus(204);
 }
 
+async function login_admin(req, res) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(422).json({ message: "Invalid fields" });
+  }
+
+  const user = await User.findOne({ email }).exec();
+  if (!user) {
+    return res.status(401).json({ message: "Email or password incorrect" });
+  }
+
+  if(user.isStaff === false){
+    return res.status(403).json({message:"you do not have access"})
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    return res.status(402).json({ message: "Email or password incorrect" });
+  }
+
+  const accessToken = jwt.sign(
+    {
+      id: user.id,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: "1800s",
+    }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      id: user.id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
+
+  user.refresh_token = refreshToken;
+
+  await user.save();
+
+  res.cookie("refresh_token", refreshToken, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 100,
+    secure: true,
+  });
+  res.json({ access_token: accessToken });
+}
+
 async function login(req, res) {
   const { email, password } = req.body;
 
@@ -159,7 +213,6 @@ async function user(req, res) {
   return res.status(200).json(user);
 }
 
-
 async function getAllUser(req, res) {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 0;
@@ -203,8 +256,6 @@ async function getAllUser(req, res) {
   }
 }
 
-
-
 async function create(req, res) {
   const {
     username,
@@ -219,6 +270,7 @@ async function create(req, res) {
     password_confirm,
     birthday,
   } = req.body;
+
 
   if (
     !username ||
@@ -256,7 +308,7 @@ async function create(req, res) {
       address,
       gender,
       birthday,
-    });
+    })
     return res.sendStatus(201);
   } catch (e) {
     return res
@@ -320,6 +372,7 @@ async function deleteUser(req, res) {
 module.exports = {
   register,
   login,
+  login_admin,
   logout,
   refresh,
   user,
@@ -328,4 +381,5 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+
 };

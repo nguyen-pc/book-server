@@ -24,5 +24,10 @@ const BorrowSchema = Schema({
     type: Date,
     default: null,
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "returned", "rejected"],
+    default: "pending",
+  },
 });
 module.exports = mongoose.model("Borrow", BorrowSchema);

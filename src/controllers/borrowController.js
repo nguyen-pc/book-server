@@ -11,6 +11,7 @@ async function create(req, res) {
     borrowedDay,
     estimatedReturnDate,
     actualReturnDate,
+    status,
   } = req.body;
   if (!user || !book || !borrowedDay) {
     return res.status(422).json({ message: "Invalid field" });
@@ -36,6 +37,7 @@ async function create(req, res) {
       borrowedDay,
       estimatedReturnDate,
       actualReturnDate,
+      status,
     });
 
     // Giảm số lượng sách
@@ -47,6 +49,39 @@ async function create(req, res) {
     return res
       .status(400)
       .json({ message: "Could not create borrow", error: e.message });
+  }
+}
+
+async function updateStatus(req, res) {
+  const { borrowId, status, actualReturnDate } = req.body;
+
+  console.log(borrowId, status);
+
+  try {
+    const borrow = await Borrow.findById(borrowId);
+    if (!borrow) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+    if (actualReturnDate != null) {
+      borrow.actualReturnDate = actualReturnDate;
+    }
+    if(status === "approved"){
+      // await emailService.sendSimpleEmail(email, bookName, estimatedReturnDate);
+    }
+    if (status === "returned") {
+      const book = await Book.findById(borrow.book._id);
+      if (book) {
+        book.number += 1;
+        await book.save();
+      }
+    }
+    borrow.status = status;
+    await borrow.save();
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(500)
+      .json({ message: "Could not update status", error: e.message });
   }
 }
 
@@ -116,4 +151,10 @@ async function getUserBorrow(req, res) {
   }
 }
 
-module.exports = { create, getAllBorrow, returnBook, getUserBorrow };
+module.exports = {
+  create,
+  getAllBorrow,
+  returnBook,
+  getUserBorrow,
+  updateStatus,
+};
